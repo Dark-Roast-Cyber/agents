@@ -6,6 +6,8 @@ This guide defines the default visual direction for AI agent avatars in this rep
 
 Use it to write consistent image prompts that produce a recognizable family of avatars: polished chibi-style mascots with strong personality, clean presentation, and minimal visual clutter.
 
+This guide is intended to be used together with the local generator at `openwebui/generate_image.py` and the repo-local avatar asset directory at `.opencode/images/`.
+
 ---
 
 ## Core visual style
@@ -101,6 +103,14 @@ Recommended approach per avatar:
 - Mention the unique primary color.
 - Keep role cues restrained and specific.
 - Ask for minimal clutter and no generic cyber decoration.
+
+### Repo workflow notes
+
+- Prefer transparent PNG output for canonical avatars.
+- Store generated source assets in `.opencode/images/`.
+- Use JPEG only when testing OpenWebUI compatibility issues.
+- If the agent identity strongly suggests a presentation, infer it in the prompt unless the user asks otherwise.
+- Treat prompts as durable assets: optimize for repeatability, not novelty.
 
 Good prompt ingredients:
 

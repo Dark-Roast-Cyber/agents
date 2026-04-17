@@ -35,6 +35,8 @@ The repo is designed around a simple principle: author locally, validate locally
 │   │   └── search-vulnerabilities.md
 │   ├── skills/
 │   │   └── README.md
+│   ├── images/
+│   │   └── *.png
 │   └── package.json
 ├── openwebui/
 │   ├── __init__.py
@@ -47,10 +49,13 @@ The repo is designed around a simple principle: author locally, validate locally
 │   ├── prompts.py
 │   ├── skills.py
 │   ├── functions.py
+│   ├── generate_image.py
 │   ├── tools.py
 │   ├── knowledge.py
 │   └── chat.py
 ├── AGENTS.md
+├── AGENTIC-SYSTEM-PROMPT-STYLE-GUIDE.md
+├── AI-AVATAR-PROMPT-STYLING-GUIDE.md
 └── .gitignore
 ```
 
@@ -76,6 +81,75 @@ The repo is designed around a simple principle: author locally, validate locally
 - The filename slug is the canonical id.
 - Display name defaults to the titleized filename slug.
 - Example: `armis-query-agent.md` → `Armis Query Agent`
+
+## Local Authoring Workflow
+
+This repo is intentionally local-first and OpenCode-native.
+
+- Author agents, commands, and skills as markdown in `.opencode/`
+- Treat local markdown as the source of truth for system prompts and prompt templates
+- Use the local `openwebui` Python package for sync, inspection, and API exploration
+- Push outward to OpenWebUI only after local review
+- Avoid hand-editing OpenWebUI when the change should live in repo source
+
+### Local Workflow Rules
+
+- Edit durable agent behavior in `.opencode/agents/*.md`
+- Edit slash-style routing prompts in `.opencode/commands/*.md`
+- Edit reusable playbooks in `.opencode/skills/*.md`
+- Keep prompt guidance platform-agnostic unless the detail is specifically about this repo's sync/runtime behavior
+- Use repo docs such as `AGENTIC-SYSTEM-PROMPT-STYLE-GUIDE.md` and `AI-AVATAR-PROMPT-STYLING-GUIDE.md` as the standing references for future sessions
+
+## Avatar Workflow
+
+Agent avatars are also managed locally-first.
+
+- Store generated avatar source files in `.opencode/images/`
+- Prefer transparent PNG output for the canonical avatar asset
+- Use JPEG only as a compatibility fallback for UI rendering tests
+- Preserve `meta.profile_image_url` during sync so pushed models do not lose their assigned avatar
+- Let OpenWebUI handle framing; do not generate circles, badges, or background containers into the art
+
+### Avatar Source Of Truth
+
+- Prompt/style conventions live in `AI-AVATAR-PROMPT-STYLING-GUIDE.md`
+- Image generation is done with `openwebui/generate_image.py`
+- Generated review assets may live temporarily in `.opencode/images/`, but do not need to be committed unless they are becoming durable source artifacts
+
+### Image Generation Defaults
+
+- Model: `gpt-image-1.5`
+- Preferred format: `png`
+- Preferred background: `transparent`
+- Preferred style: polished chibi / product mascot
+- One unique primary color per agent
+- Minimal background and minimal role props
+
+### Image Generation Command
+
+Use `uv` from the `openwebui/` project:
+
+```bash
+uv run python "openwebui/generate_image.py" \
+  --prompt "<avatar prompt>" \
+  --output "/absolute/path/to/output.png" \
+  --background transparent \
+  --format png
+```
+
+Environment variables:
+
+- `OPENAI_API_KEY` is preferred
+- `OPEN_AI_API` is supported as a fallback for compatibility with prior local setup
+
+### Prompt Generation Rules
+
+- Follow `AI-AVATAR-PROMPT-STYLING-GUIDE.md`
+- Ask for polished chibi mascot styling, personality, and memorability
+- Infer likely gender presentation from the agent's identity when appropriate unless the user asks otherwise
+- Include the agent's unique primary color explicitly in the prompt
+- Prefer one subtle prop or clothing cue at most; avoid clutter
+- Keep prompts explicit about what to avoid: floating UI, locks, digital particles, circles, badges, busy backgrounds, and generic cyber wallpaper
 
 ## When to Create an Agent vs Skill vs Command
 
