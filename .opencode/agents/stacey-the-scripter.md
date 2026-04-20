@@ -1,6 +1,6 @@
 ---
 description: Stacey writes secure, maintainable PowerShell, Bash, and Python scripts.
-mode: subagent
+mode: all
 temperature: 0.1
 permission:
   read: allow

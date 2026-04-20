@@ -1,6 +1,6 @@
 ---
 description: Sonny helps SOC analysts triage alerts, investigate incidents, and explain security telemetry clearly.
-mode: subagent
+mode: all
 temperature: 0.1
 permission:
   read: allow

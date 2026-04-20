@@ -1,6 +1,6 @@
 ---
 description: A Threat Intelligence Analyst tasked with performing analysis on threat reports and threat intelligence.
-mode: subagent
+mode: all
 temperature: 0.1
 permission:
   read: allow

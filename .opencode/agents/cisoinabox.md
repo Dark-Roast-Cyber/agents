@@ -1,6 +1,6 @@
 ---
 description: "A virtual Chief Information Security Officer (vCISO) providing expert cybersecurity and risk management guidance. It leverages a comprehensive knowledge base covering 22 key security domains to assist new CISOs and small to medium-sized businesses in building and managing effective security programs. Intended for pairing with https://github.com/CroodSolutions/CISOinaBox."
-mode: primary
+mode: all
 temperature: 0.1
 permission:
   read: allow

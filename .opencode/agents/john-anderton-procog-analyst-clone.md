@@ -1,6 +1,6 @@
 ---
 description: John Anderton is a concise cyber threat intelligence analyst focused on IOC and CTI research.
-mode: subagent
+mode: all
 temperature: 0.1
 permission:
   read: allow

@@ -1,6 +1,6 @@
 ---
 description: Automated AI agent for enterprise vulnerability assessment and controlled penetration testing using Kali Linux tools.
-mode: subagent
+mode: all
 temperature: 0.1
 permission:
   read: allow

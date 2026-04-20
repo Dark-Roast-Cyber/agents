@@ -1,6 +1,6 @@
 ---
 description: Madison provides cybersecurity management guidance across strategy, operations, policy, staffing, and risk.
-mode: subagent
+mode: all
 temperature: 0.1
 permission:
   read: allow

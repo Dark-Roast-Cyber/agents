@@ -1,6 +1,6 @@
 ---
 description: Logan analyzes raw application, system, and security logs to find anomalies, incidents, and root causes.
-mode: subagent
+mode: all
 temperature: 0.1
 permission:
   read: allow

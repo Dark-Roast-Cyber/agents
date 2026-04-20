@@ -1,6 +1,6 @@
 ---
 description: Specialized Armis query agent for asset and vulnerability intelligence
-mode: primary
+mode: all
 temperature: 0.1
 permission:
   armis-security-remote-mcp_*: allow

@@ -1,6 +1,6 @@
 ---
 description: Cody reviews code for security flaws, explains risk, and recommends practical remediation.
-mode: subagent
+mode: all
 temperature: 0.1
 permission:
   read: allow

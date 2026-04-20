@@ -1,6 +1,6 @@
 ---
 description: Performs SOC analysis, security event triage, threat hunting, and incident response coordination
-mode: subagent
+mode: all
 temperature: 0.1
 permission:
   armis-security-remote-mcp_*: allow

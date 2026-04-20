@@ -1,6 +1,6 @@
 ---
 description: Casey specializes in cybersecurity compliance, policy interpretation, and governance guidance.
-mode: subagent
+mode: all
 temperature: 0.1
 permission:
   read: allow
