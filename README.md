@@ -1,38 +1,90 @@
 # Agents
 
-OpenCode-first security operations assets for teams that need reusable agent behavior, slash-style commands, and shared playbooks.
+Security operations agents, commands, and skills authored locally as markdown and designed to run across multiple harnesses.
 
-This repository is designed to work across multiple harnesses and runtimes by keeping durable behavior in plain markdown and using lightweight sync tooling only when needed. It is intended for security operations, security services, and adjacent work such as Armis asset intelligence, vulnerability workflows, SOC triage, threat intelligence, code review, scripting, compliance, and vCISO guidance.
+This repository is focused on building agents that are:
 
-## What This Repo Is
+- guided by durable operating instructions and repeatable workflows
+- guarded by explicit scope, safety, and action rules
+- connected to security tools and platform-specific capabilities where appropriate
+- able to work together as specialized roles to solve operational problems
 
-- Local source of truth for agents, commands, and skills
-- Markdown-first and portable across harnesses
-- Built for OpenCode authoring and OpenWebUI publishing
-- Focused on practical security operations and services workflows
+The result is a practical, source-controlled system for security operations and security services work, including Armis-driven asset intelligence, vulnerability analysis, SOC triage, threat intelligence, code security review, compliance guidance, scripting, and vCISO support.
 
-## Compatibility Model
+![Agents in OpenWebUI](./AgentsinOpenWebUI.png)
 
-The content here is intentionally harness-agnostic:
+## Overview
 
-- Durable behavior lives in `.opencode/agents/*.md`
-- Reusable playbooks live in `.opencode/skills/*.md`
-- Slash-style routing lives in `.opencode/commands/*.md`
-- The `openwebui/` package provides sync and exploration tooling when you want to publish or inspect content
+This repository is the local source of truth for:
 
-This keeps the repo usable in OpenCode while still being easy to adapt to other agent harnesses that consume markdown instructions.
+- agents in `.opencode/agents/`
+- commands in `.opencode/commands/`
+- skills in `.opencode/skills/`
+- optional avatar assets in `.opencode/images/`
+
+It is built around a simple operating model:
+
+1. Author locally
+2. Review locally
+3. Validate locally
+4. Publish outward when needed
+
+OpenCode is the primary authoring environment. OpenWebUI is a publishing and runtime target. The content itself is intentionally markdown-first and harness-friendly so it can be adapted to other runtimes that consume structured agent instructions.
+
+## Design Goals
+
+- Keep durable agent behavior in version-controlled markdown
+- Preserve portability across harnesses and runtimes
+- Encode operational guidance, constraints, and safety rules directly in the artifacts
+- Support specialist agents that can collaborate on multi-part security work
+- Keep publishing separate from authoring so local files remain authoritative
+
+## Operating Model
+
+### Local Development
+
+The expected local workflow is straightforward:
+
+1. `git clone` the repository into a working directory
+2. Open that checkout in OpenCode
+3. Edit the markdown artifacts under `.opencode/`
+4. Review and validate changes locally
+5. Use the sync tooling only when you intend to publish to OpenWebUI
+
+### Production Runtime
+
+In production, the repository is consumed from a containerized working directory:
+
+1. The container performs a `git pull` to refresh the checkout
+2. OpenCode opens that working directory inside the container
+3. The same markdown source of truth is available at runtime
+4. Publishing or import operations run from that updated checkout when needed
+
+This model keeps local authoring, source control, and runtime behavior aligned.
+
+## Compatibility
+
+The repository is designed to be compatible with multiple harnesses by keeping the core assets simple and portable:
+
+- agent definitions live in markdown files
+- commands are markdown-based routing prompts
+- skills are markdown playbooks rather than embedded application logic
+- the `openwebui/` package is an adapter layer for sync and API interactions, not the source of truth
+
+That separation allows the same repo to serve as an OpenCode-native workspace while remaining adaptable to other agent harnesses.
 
 ## Repository Layout
 
 ```text
 .opencode/
   agents/      # Durable agent personas and operating rules
-  commands/    # Slash commands that route into agents
-  skills/      # Reusable playbooks and workflow guidance
-  images/      # Optional agent avatar assets
+  commands/    # Slash-style routing prompts
+  skills/      # Reusable workflow guidance and playbooks
+  images/      # Optional profile images and avatar assets
   package.json # OpenCode plugin dependency
-openwebui/     # Local Python package for sync and API tooling
-AGENTS.md      # Project guide and operating conventions
+openwebui/     # Python sync and API tooling for OpenWebUI
+AGENTS.md      # Detailed project guide and operating conventions
+README.md      # Project overview
 ```
 
 Trimmed `.opencode/` tree:
@@ -63,36 +115,28 @@ Trimmed `.opencode/` tree:
   package.json
 ```
 
-## Included Capabilities
+The tree above intentionally omits cache files, generated Python bytecode, and other low-value runtime noise.
 
-- Armis Standard Query workflows for devices, vulnerabilities, and activities
-- SOC triage and incident support
-- Threat intelligence research
-- Secure code review and scripting assistance
-- Compliance and governance guidance
-- Cybersecurity management and vCISO support
+## What The Agents Do
 
-## Local Workflow
+The repository includes specialist agents for:
 
-This repo is designed to be cloned directly into a working directory and opened by OpenCode from that checkout.
+- Armis query and asset intelligence
+- SOC analysis and triage
+- threat intelligence research
+- code security review
+- secure scripting
+- compliance and governance analysis
+- cybersecurity management
+- vCISO-style advisory support
 
-In local development, the expected flow is:
+These agents are meant to be useful individually, but the broader design is collaborative: each agent carries instructions, boundaries, and task-specific behavior so multiple roles can contribute to solving a larger security problem.
 
-1. `git clone` the repo
-2. Open the cloned working directory in OpenCode
-3. Edit the markdown assets in `.opencode/`
-4. Review changes locally
-5. Run a sync plan before publishing
-6. Push to OpenWebUI only when you are ready
+## OpenWebUI Sync Tooling
 
-In production, the repo is used differently:
+The `openwebui/` Python package provides local tooling for planning, pushing, importing, and exploring OpenWebUI content.
 
-1. A container performs a `git pull` to refresh the repo state
-2. OpenCode opens the working directory inside that container
-3. The container sees the same markdown source of truth as the repo
-4. Any publishing or sync step happens from that updated checkout
-
-Common sync commands:
+Common commands:
 
 ```bash
 uv run --project openwebui python -m openwebui sync plan
@@ -100,25 +144,26 @@ uv run --project openwebui python -m openwebui sync push agents
 uv run --project openwebui python -m openwebui sync push commands
 uv run --project openwebui python -m openwebui sync push skills
 uv run --project openwebui python -m openwebui sync push all
+uv run --project openwebui python -m openwebui sync import agents
 ```
 
-## Design Rules
+Practical rules:
 
-- Keep prompts concise and operational
-- Prefer platform-agnostic guidance unless harness behavior matters
-- Use the smallest durable abstraction that fits the task
-- Treat local markdown as authoritative
-- Preserve security posture, validation, and confidence scoring where relevant
+- treat local markdown as authoritative
+- run `sync plan` before push or import operations
+- use publishing intentionally rather than as part of normal editing
+- keep runtime-specific sync behavior out of the durable agent content unless it materially matters
 
 ## Primary Use Cases
 
-- Search and analysis support for Armis environments
-- Repeatable security triage workflows
-- Security operations and service delivery playbooks
-- Reusable instructions for specialized analyst personas
+- Armis environment search and analysis
+- repeatable security triage workflows
+- security operations and services delivery
+- reusable specialist personas with explicit guidance and guardrails
+- local-first authoring with controlled publication to OpenWebUI
 
-## Notes
+## Additional References
 
-- `AGENTS.md` contains the detailed project guide and inventory
-- The repo is structured for local authoring first, publishing second
-- Avatar and image workflows are optional and handled locally when needed
+- `AGENTS.md` contains the detailed project guide, inventory, and conventions
+- `AGENTIC-SYSTEM-PROMPT-STYLE-GUIDE.md` documents prompt design guidance
+- `AI-AVATAR-PROMPT-STYLING-GUIDE.md` documents avatar generation guidance
