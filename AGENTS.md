@@ -1,457 +1,146 @@
-# Armis Security Agents Project
+# Security Agents Project Guide
 
-This repository manages OpenCode-first security operations assets: agents, skills, and slash commands authored as local markdown and synced to OpenWebUI when needed. It is primarily focused on Armis-driven security workflows, but it also includes broader security personas for SOC operations, CTI, compliance, code review, scripting, management, and executive guidance.
+This repository manages OpenCode-first security operations assets: agents, skills, and slash commands authored as local markdown. The public README should describe what the project offers to humans. Internal operating guidance for AI coding tools belongs here or in linked internal docs.
 
-The repo is designed around a simple principle: author locally, validate locally, and publish outward to OpenWebUI as a distribution target.
+## Source Of Truth
 
-## Project Overview
+- Local markdown files are authoritative.
+- OpenWebUI is a publish/import target, not the primary editing surface.
+- Agents live in `.opencode/agents/`.
+- Commands live in `.opencode/commands/`.
+- Skills live in `.opencode/skills/`.
+- Optional avatar assets live in `.opencode/images/`.
+- Sync and API tooling lives in `openwebui/`.
 
-- **Primary purpose**: maintain OpenCode agents, skills, and commands for security operations
-- **Authoring model**: local markdown files in this repo are the source of truth
-- **Publishing target**: OpenWebUI models, skills, and prompts
-- **Operational focus**: Armis asset intelligence, vulnerability workflows, SOC analysis, and adjacent security functions
-- **Tooling included**: a local `openwebui` Python package and CLI for planning, pushing, importing, and exploring OpenWebUI content
+## Internal Workflow Docs
 
-## Project Structure
+Use `docs/internal-workflows.md` for detailed local authoring, agent creation, skill creation, command creation, avatar generation, and OpenWebUI sync/deployment workflows.
+
+Keep `README.md` public-facing and avoid placing internal runtime, sync, or AI-coding instructions there.
+
+## Project Layout
 
 ```text
 /
 ├── .opencode/
 │   ├── agents/
-│   │   ├── armis-query-agent.md
-│   │   ├── soc-analyst.md
-│   │   ├── ai-nyx-the-red-teamer.md
-│   │   ├── john-anderton-procog-analyst-clone.md
-│   │   ├── cisoinabox.md
-│   │   ├── cody-the-code-security-analyst.md
-│   │   ├── stacey-the-scripter.md
-│   │   ├── logan-the-log-analyst.md
-│   │   ├── madison-the-cybersecurity-manager.md
-│   │   ├── casey-the-compliance-analyst.md
-│   │   └── sonny-the-soc-analyst.md
 │   ├── commands/
-│   │   ├── search-armis.md
-│   │   ├── search-device.md
-│   │   └── search-vulnerabilities.md
 │   ├── skills/
-│   │   └── README.md
 │   ├── images/
-│   │   └── *.png
 │   └── package.json
+├── docs/
+│   └── internal-workflows.md
 ├── openwebui/
-│   ├── __init__.py
-│   ├── pyproject.toml
-│   ├── cli.py
-│   ├── client.py
-│   ├── sync.py
-│   ├── opencode.py
-│   ├── models.py
-│   ├── prompts.py
-│   ├── skills.py
-│   ├── functions.py
-│   ├── generate_image.py
-│   ├── tools.py
-│   ├── knowledge.py
-│   └── chat.py
 ├── AGENTS.md
+├── README.md
 ├── AGENTIC-SYSTEM-PROMPT-STYLE-GUIDE.md
-├── AI-AVATAR-PROMPT-STYLING-GUIDE.md
-└── .gitignore
+└── AI-AVATAR-PROMPT-STYLING-GUIDE.md
 ```
 
-## OpenCode ↔ OpenWebUI Sync
+## Editing Rules
 
-### Sync Philosophy
+- Preserve the markdown-first model.
+- Use the smallest durable abstraction that matches the task.
+- Edit agent behavior in `.opencode/agents/*.md`.
+- Edit slash-style routing prompts in `.opencode/commands/*.md`.
+- Edit reusable playbooks in `.opencode/skills/**/SKILL.md` or established skill markdown files.
+- Keep prompt guidance platform-agnostic unless the detail is specifically about this repo's sync/runtime behavior.
+- Update inventories when adding, renaming, or removing agents, commands, or durable skills.
+- Use `permission`, not the deprecated `tools` field, in OpenCode agent frontmatter.
+- Prefer lowercase kebab-case filenames and treat the filename slug as canonical.
 
-- This repo is the **source of truth** for OpenCode-first authoring.
-- OpenWebUI is a **publish/import target**, not the primary editing surface.
-- v1 sync is **overwrite-oriented**: push local markdown outward, or import tagged remote assets inward.
-- v1 does **not** attempt bidirectional merge, conflict resolution, or delete propagation.
-- Import remote models only when `meta.tags` contains a tag object with `name == "drc-agent"`.
-- Ignore bulky UI-only fields during import/export, except preserve `meta.profile_image_url` when present so agent images survive sync.
+## When To Create Artifacts
 
-### Object Mapping
+### Agent
 
-- **Agent** → OpenWebUI **Workspace Model**
-- **Skill** → OpenWebUI **Skill**
-- **Command** → OpenWebUI **Prompt**
+Create an agent when the change defines a durable persona or long-lived behavior that a user would plausibly select as a model or delegate to as a specialist.
 
-### Naming Rules
+### Skill
 
-- The filename slug is the canonical id.
-- Display name defaults to the titleized filename slug.
-- Example: `armis-query-agent.md` → `Armis Query Agent`
+Create a skill when the change is a reusable workflow, playbook, policy, or repeatable instruction set. Skills should be guidance, not identity.
 
-## Local Authoring Workflow
+### Command
 
-This repo is intentionally local-first and OpenCode-native.
-
-- Author agents, commands, and skills as markdown in `.opencode/`
-- Treat local markdown as the source of truth for system prompts and prompt templates
-- Use the local `openwebui` Python package for sync, inspection, and API exploration
-- Push outward to OpenWebUI only after local review
-- Avoid hand-editing OpenWebUI when the change should live in repo source
-
-### Local Workflow Rules
-
-- Edit durable agent behavior in `.opencode/agents/*.md`
-- Edit slash-style routing prompts in `.opencode/commands/*.md`
-- Edit reusable playbooks in `.opencode/skills/*.md`
-- Keep prompt guidance platform-agnostic unless the detail is specifically about this repo's sync/runtime behavior
-- Use repo docs such as `AGENTIC-SYSTEM-PROMPT-STYLE-GUIDE.md` and `AI-AVATAR-PROMPT-STYLING-GUIDE.md` as the standing references for future sessions
-
-## Avatar Workflow
-
-Agent avatars are also managed locally-first.
-
-- Store generated avatar source files in `.opencode/images/`
-- Prefer transparent PNG output for the canonical avatar asset
-- Use JPEG only as a compatibility fallback for UI rendering tests
-- Preserve `meta.profile_image_url` during sync so pushed models do not lose their assigned avatar
-- Let OpenWebUI handle framing; do not generate circles, badges, or background containers into the art
-
-### Avatar Source Of Truth
-
-- Prompt/style conventions live in `AI-AVATAR-PROMPT-STYLING-GUIDE.md`
-- Image generation is done with `openwebui/generate_image.py`
-- Generated review assets may live temporarily in `.opencode/images/`, but do not need to be committed unless they are becoming durable source artifacts
-
-### Image Generation Defaults
-
-- Model: `gpt-image-1.5`
-- Preferred format: `png`
-- Preferred background: `transparent`
-- Preferred style: polished chibi / product mascot
-- One unique primary color per agent
-- Minimal background and minimal role props
-
-### Image Generation Command
-
-Use `uv` from the `openwebui/` project:
-
-```bash
-uv run python "openwebui/generate_image.py" \
-  --prompt "<avatar prompt>" \
-  --output "/absolute/path/to/output.png" \
-  --background transparent \
-  --format png
-```
-
-Environment variables:
-
-- `OPENAI_API_KEY` is preferred
-- `OPEN_AI_API` is supported as a fallback for compatibility with prior local setup
-
-### Prompt Generation Rules
-
-- Follow `AI-AVATAR-PROMPT-STYLING-GUIDE.md`
-- Ask for polished chibi mascot styling, personality, and memorability
-- Infer likely gender presentation from the agent's identity when appropriate unless the user asks otherwise
-- Include the agent's unique primary color explicitly in the prompt
-- Prefer one subtle prop or clothing cue at most; avoid clutter
-- Keep prompts explicit about what to avoid: floating UI, locks, digital particles, circles, badges, busy backgrounds, and generic cyber wallpaper
-
-## When to Create an Agent vs Skill vs Command
-
-Use the smallest durable abstraction that matches the job.
-
-### Create an Agent when
-
-- You need a durable persona or long-lived system behavior
-- The artifact represents something a user would plausibly select as a model
-- The behavior should carry its own identity, permissions, tone, and operating rules
-
-### Create a Skill when
-
-- You need reusable instructions or a playbook
-- The content should be attached or invoked on demand
-- The content is guidance or workflow, not identity
-
-### Create a Command when
-
-- You need a slash-style shortcut
-- You are wrapping a common task or workflow
-- You want a prompt template that routes work into an agent consistently
+Create a command when the change is a slash-style shortcut or routing prompt for a common task.
 
 ## Agent Inventory
 
-The repository currently contains 12 agents.
-
 | File | Purpose | Mode | Description |
 | --- | --- | --- | --- |
-| `.opencode/agents/armis-query-agent.md` | Primary Armis ASQ query agent | primary | Translates natural-language security requests into validated Armis Standard Query workflows. |
+| `.opencode/agents/armis-query-agent.md` | Armis ASQ query agent | all | Translates natural-language security requests into validated Armis Standard Query workflows. |
+| `.opencode/agents/splunk-assistant.md` | Splunk operations | all | Handles Splunk search, discovery, alerting, saved searches, and operational workflows using Splunk MCP tools. |
 | `.opencode/agents/soc-analyst.md` | SOC analysis | subagent | Supports SOC investigations and security analysis tasks. |
-| `.opencode/agents/ai-nyx-the-red-teamer.md` | Red team/vuln assessment | subagent | Provides authorized red-team support, recon guidance, and vulnerability assessment planning. |
+| `.opencode/agents/sonny-the-soc-analyst.md` | SOC triage | subagent | Provides verdict-oriented alert triage and next-step guidance for investigations. |
+| `.opencode/agents/tim-the-threat-intel-analyst.md` | Threat intelligence analysis | subagent | Performs CTI analysis on threat reports, indicators, campaigns, and threat actors. |
 | `.opencode/agents/john-anderton-procog-analyst-clone.md` | CTI/IOC research | subagent | Summarizes IOCs, actors, campaigns, and TTPs for concise CTI workflows. |
-| `.opencode/agents/cisoinabox.md` | vCISO guidance | primary | Delivers executive-level security strategy, governance guidance, and roadmap support. |
+| `.opencode/agents/ai-nyx-the-red-teamer.md` | Red team/vuln assessment | subagent | Provides authorized red-team support, recon guidance, and vulnerability assessment planning. |
 | `.opencode/agents/cody-the-code-security-analyst.md` | Secure code review | subagent | Reviews code and configuration for security flaws, explains risk, and recommends practical remediation. |
 | `.opencode/agents/stacey-the-scripter.md` | Secure scripting | subagent | Helps produce safe, maintainable scripts across common automation languages. |
 | `.opencode/agents/logan-the-log-analyst.md` | Log analysis | subagent | Analyzes logs for anomalies, incidents, and likely root causes. |
-| `.opencode/agents/madison-the-cybersecurity-manager.md` | Cybersecurity management | subagent | Assists with practical management planning across policy, staffing, budget, and metrics. |
 | `.opencode/agents/casey-the-compliance-analyst.md` | Compliance/governance | subagent | Advises on compliance, control mapping, and governance interpretation. |
-| `.opencode/agents/sonny-the-soc-analyst.md` | SOC triage | subagent | Provides verdict-oriented alert triage and next-step guidance for investigations. |
-| `.opencode/agents/tim-the-threat-intel-analyst.md` | Threat intelligence analysis | subagent | Performs CTI analysis on threat reports, indicators, campaigns, and threat actors using Polarity and ThreatConnect tools. |
+| `.opencode/agents/madison-the-cybersecurity-manager.md` | Cybersecurity management | subagent | Assists with practical management planning across policy, staffing, budget, and metrics. |
+| `.opencode/agents/cisoinabox.md` | vCISO guidance | primary | Delivers executive-level security strategy, governance guidance, and roadmap support. |
 
 ## Command Inventory
 
-All current commands route into `armis-query-agent` and are configured with `subtask: false` to preserve the primary session context.
+| File | Command | Purpose |
+| --- | --- | --- |
+| `.opencode/commands/search-armis.md` | `/search-armis <query>` | General Armis security search. |
+| `.opencode/commands/search-device.md` | `/search-device <identifier>` | Device lookup by hostname, IP, MAC, or other identifier. |
+| `.opencode/commands/search-vulnerabilities.md` | `/search-vulnerabilities <criteria>` | Vulnerability-focused search and analysis. |
+| `.opencode/commands/sync.md` | `/sync <operation>` | OpenWebUI sync workflow routing. |
 
-- `/search-armis <query>` — general Armis security search
-- `/search-device <identifier>` — device lookup by hostname, IP, MAC, or other identifier
-- `/search-vulnerabilities <criteria>` — vulnerability-focused search and analysis
+## Skill Inventory
 
-## Skills
+| File | Purpose |
+| --- | --- |
+| `.opencode/skills/operational-framework.md` | Shared operational framework for analysis, investigation, and response tasks. |
+| `.opencode/skills/splunk-mcp/SKILL.md` | Routes Splunk requests to the correct MCP workflow. |
+| `.opencode/skills/splunk-search/SKILL.md` | Builds, validates, and refines SPL queries. |
+| `.opencode/skills/splunk-discovery/SKILL.md` | Discovers indexes, sourcetypes, sources, fields, and lookups. |
+| `.opencode/skills/splunk-alert/SKILL.md` | Investigates alerts and validates alert SPL. |
+| `.opencode/skills/splunk-savedsearch/SKILL.md` | Discovers, runs, and manages saved searches and reports. |
+| `.opencode/skills/splunk-kvstore/SKILL.md` | Discovers and queries KV store collections. |
+| `.opencode/skills/splunk-export/SKILL.md` | Extracts larger Splunk result sets with explicit bounds and pagination. |
 
-The repo includes a repo-local skills directory at `.opencode/skills/` for markdown-based reusable skills.
+## Armis Security Analysis Framework
 
-- Skills are intended for reusable instruction sets and playbooks
-- Skills are not standalone personas
-- Skills should be authored as single markdown files in `.opencode/skills/*.md`
-
-## Sync Tooling
-
-The `openwebui` Python package provides CLI support for sync operations and direct API exploration.
-
-### Sync Commands
-
-- `python -m openwebui sync plan` — read-only sync preview
-- `python -m openwebui sync push agents` — push agents to OpenWebUI
-- `python -m openwebui sync push commands` — push commands to OpenWebUI
-- `python -m openwebui sync push skills` — push skills to OpenWebUI
-- `python -m openwebui sync push all` — push everything
-- `python -m openwebui sync import agents` — import tagged models from OpenWebUI
-
-### Other CLI Commands
-
-- `python -m openwebui models list`
-- `python -m openwebui models get <id>`
-- `python -m openwebui models create --id <id> --name <name> [--base-model ...] [--description ...] [--system-prompt ...]`
-- `python -m openwebui models delete <id>`
-- `python -m openwebui models export`
-- `python -m openwebui tools list`
-- `python -m openwebui functions list`
-- `python -m openwebui prompts list`
-- `python -m openwebui skills list`
-- `python -m openwebui knowledge list`
-- `python -m openwebui chat --model <model> --message <message>`
-
-### Practical Usage Notes
-
-- Run sync tooling intentionally; push operations are publish actions, not dry runs
-- Use `sync plan` before `sync push` when validating a release
-- Use `sync import agents` only for remote models intentionally tagged `drc-agent`
-- Keep local markdown clean and reviewable before pushing outward
-
-## Security Analysis Framework
-
-The Armis-focused content in this repo follows a repeatable query and validation model.
+The Armis-focused content follows a repeatable query and validation model.
 
 ### Query Strategy
 
-1. **Scope Clarification** — endpoints vs network devices vs all assets
-2. **Broad Initial Query** — establish the baseline view
-3. **Refined Filters** — add category, boundary, risk level, or product filters
-4. **Result Validation** — cross-check counts when discrepancies appear
-5. **Final Analysis** — provide actionable findings with confidence scoring
+1. Scope clarification: endpoints vs network devices vs all assets.
+2. Broad initial query: establish the baseline view.
+3. Refined filters: add category, boundary, risk level, or product filters.
+4. Result validation: cross-check counts when discrepancies appear.
+5. Final analysis: provide actionable findings with confidence scoring.
 
-### Default Parameters
+### Defaults
 
-- **Time frames**: 7 days for security analysis, 30 days for vulnerability analysis
-- **Default scope**: endpoints only for security workflows unless clarified otherwise
-- **Default boundaries**: Corporate + DMZ for security analysis
-- **Output threshold**: 20 items before switching from terminal output to file output
+- Time frames: 7 days for security analysis, 30 days for vulnerability analysis.
+- Default scope: endpoints only for security workflows unless clarified otherwise.
+- Default boundaries: Corporate and DMZ for security analysis.
+- Output threshold: 20 items before switching from terminal output to file output.
 
 ### Confidence Scoring
 
-- **High** — specific query, validated results, clear scope
-- **Medium** — broad query with minor ambiguity and basic validation
-- **Low** — very broad query, suspected ambiguity, or possible data quality issues
-
-## Smart Query Templates
-
-### Unprotected Endpoints
-
-```asq
-in:devices timeFrame:"7 Days" category:Computers boundary:Corporate,DMZ !dataSource:(name:CrowdStrike,SentinelOne,"Microsoft Defender")
-```
-
-### Critical Risk Devices
-
-```asq
-in:devices timeFrame:"7 Days" category:Computers riskLevel:Critical
-```
-
-### Security Software Inventory
-
-```asq
-in:devices timeFrame:"7 Days" application:(name:"CrowdStrike" OR name:"SentinelOne")
-```
-
-## File Output Format
-
-Large result sets should be written to timestamped JSON with structured metadata.
-
-```json
-{
-  "query": "ASQ query used",
-  "timestamp": "2025-11-30T19:44:31Z",
-  "total_results": 59,
-  "confidence_score": "High",
-  "data_quality": "Validated",
-  "scope": "Corporate+DMZ endpoints only",
-  "summary": "Brief description of findings",
-  "risk_distribution": {},
-  "validation_notes": "Cross-checked with alternative query method"
-}
-```
-
-## Error Recovery and Validation
-
-### Common Clarifications
-
-- Is the identifier a hostname, IP address, MAC address, or device ID?
-- Should the search target devices, vulnerabilities, or activities?
-- What time frame should be used?
-- Should the scope be endpoints only, network devices, or all assets?
-- Should the search include Corporate, DMZ, or both?
-
-### Validation Checks
-
-- Cross-check query results when counts appear inconsistent
-- Validate device counts through alternate query constructions
-- Confirm vendor naming variations when checking security products
-- Call out uncertainty instead of overstating confidence
+- High: specific query, validated results, clear scope.
+- Medium: broad query with minor ambiguity and basic validation.
+- Low: very broad query, suspected ambiguity, or possible data quality issues.
 
 ## OpenCode Integration Notes
 
-### Permission Model
+- Use `mode: primary` for durable user-selectable agents.
+- Use `mode: subagent` for specialized supporting roles.
+- Use `mode: all` only when the agent should be available both directly and as a subagent.
+- Keep command routing stable unless there is a clear design reason to change it.
+- After changing OpenCode agent, skill, command, plugin, MCP, or config files, tell the user to restart OpenCode for config-time changes to take effect.
 
-- **Armis MCP**: `allow` for security operations
-- **Write**: `ask` for file modifications where needed
-- **Read**: `allow` for local analysis
-- **Webfetch**: `ask` for external documentation lookup
+## References
 
-### Agent Mode Expectations
-
-- Use **primary** mode for durable user-selectable agents
-- Use **subagent** mode for specialized supporting roles
-- Keep command routing stable unless there is a clear design reason to change it
-
-## Development Guidelines
-
-### Adding a New Agent
-
-1. Create a markdown file in `.opencode/agents/`
-2. Use the filename slug as the canonical id
-3. Add clear frontmatter, typically including:
-   - `description`
-   - `mode`
-   - `temperature`
-   - `permission`
-4. Use `permission`, not the deprecated `tools` field
-5. Write concise, durable instructions that define identity, scope, and operating rules
-6. Update this `AGENTS.md` inventory and any relevant sync documentation
-
-### Adding a New Skill
-
-1. Create a markdown file in `.opencode/skills/`
-2. Keep it reusable and identity-free
-3. Focus on workflow, policy, or repeatable instructions
-4. Name it clearly so its purpose is obvious from the slug
-5. Update this guide if the skill becomes part of the standard project workflow
-
-### Adding a New Command
-
-1. Create a markdown file in `.opencode/commands/`
-2. Set `agent: <agent-slug>` to define routing
-3. Set `subtask: false` unless there is a deliberate reason to isolate context
-4. Keep the body short and task-oriented
-5. Follow established error recovery and scope clarification patterns
-6. Update the command inventory in this file
-
-### Naming Conventions
-
-- Prefer lowercase kebab-case filenames
-- Treat the filename slug as canonical across sync workflows
-- Let the display name default to the titleized slug unless there is a strong reason to override it
-- Avoid duplicate concepts unless retaining a legacy compatibility entry intentionally
-
-### Armis-Specific Guidance
-
-- Maintain `temperature: 0.1` for deterministic security analysis where applicable
-- Preserve the query validation and confidence-scoring framework
-- Keep endpoint-vs-network scope clarification explicit
-- Document major capability changes in this file
-
-## Testing and Validation
-
-### Recommended Test Scenarios
-
-1. **Unprotected endpoint search** — verify network device exclusion
-2. **Critical vulnerability analysis** — test risk prioritization
-3. **Device lookup by hostname** — validate multi-field search behavior
-4. **Security software inventory** — test vendor name variations
-5. **Large result sets** — verify file output formatting and summaries
-
-### Quality Checks
-
-- Cross-check query results with alternate methods
-- Validate confidence scoring against query specificity
-- Test error recovery with ambiguous input
-- Verify file output format consistency
-- Confirm the permission model still matches intended usage
-
-## External Dependencies and References
-
-### MCP Integration
-
-- **Armis Security Remote MCP** is the primary data source for Armis security workflows
-- Wildcard permissions use the `armis-security-remote-mcp_*` pattern
-
-### References
-
+- Internal workflows: `docs/internal-workflows.md`
+- Prompt style guide: `AGENTIC-SYSTEM-PROMPT-STYLE-GUIDE.md`
+- Avatar style guide: `AI-AVATAR-PROMPT-STYLING-GUIDE.md`
 - OpenCode Agents: https://opencode.ai/docs/agents/
 - OpenCode Commands: https://opencode.ai/docs/commands/
 - OpenCode Permissions: https://opencode.ai/docs/permissions/
-
-## Version History
-
-### v2.4 (2026-04-16)
-- Rewrote `AGENTS.md` into a comprehensive project guide with clearer structure and navigation
-- Added explicit OpenCode ↔ OpenWebUI sync mapping for agents, skills, and commands
-- Documented the local `openwebui` Python package and CLI sync workflows in one place
-- Expanded project structure, inventory, and development guidance while preserving Armis operational content
-
-### v2.3 (2026-04-16)
-- Imported 10 `drc-agent` tagged models from OpenWebUI into `.opencode/agents/`
-- Added the `drc-agent` tag to 9 AI Team models in OpenWebUI for sync eligibility
-- Improved imported agents with proper OpenCode frontmatter, including `temperature`, `permission`, and `mode`
-- Pushed all local agents back to OpenWebUI using the repo sync tooling
-- Documented that `ai-cody-the-code-security-analyst-.md` (trailing hyphen) is superseded by `ai-cody-the-code-security-analyst-frontier.md`
-
-### v2.2 (2026-04-16)
-- Added minimal OpenCode/OpenWebUI sync guidance for agents, skills, and commands
-- Added repo-local `.opencode/skills/` convention for markdown-based skills
-- Added Python sync tooling for plan, push, and tagged-agent import workflows
-
-### v2.1 (2026-04-15)
-- Migrated agent directory from `.opencode/agent/` to `.opencode/agents/` (OpenCode convention)
-- Migrated command directory from `.opencode/command/` to `.opencode/commands/` (OpenCode convention)
-- Replaced deprecated `tools` frontmatter with `permission` in all agent files
-- Removed root-level backup files (`armis-query-agent.md`, `armis-query.md`, `soc-analyst.md`)
-- Removed stale documentation files (improvements summary, compliance report, etc.)
-- Updated `AGENTS.md` to reflect the cleaned-up project structure
-
-### v2.0 (2025-11-30)
-- Enhanced with OpenCode best practices
-- Added temperature and permission configuration
-- Improved error recovery and validation framework
-- Added confidence scoring and data quality indicators
-- Integrated smart query templates
-- Enhanced file output format with metadata
-- Comprehensive command implementation
-
-### v1.0 (Initial)
-- Basic Armis query agent functionality
-- Simple command structure
-- Core ASQ translation capabilities
